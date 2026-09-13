@@ -1,0 +1,20 @@
+{
+  "rules": {
+    "posts": {
+      "$postId": {
+        "reactions": {
+          "$type": {
+            ".read": true,
+            ".write": "($type == 'heart' || $type == 'like' || $type == 'dislike') && newData.isNumber() && newData.val() == (data.exists() ? data.val() : 0) + 1 && newData.val() <= 100000000"
+          }
+        },
+        "comments": {
+          "$commentId": {
+            ".read": true,
+            ".write": "newData.hasChildren(['text','time','createdAt']) && newData.child('text').isString() && newData.child('text').val().length > 0 && newData.child('text').val().length <= 2000 && newData.child('time').isString() && newData.child('createdAt').isString()"
+          }
+        }
+      }
+    }
+  }
+}

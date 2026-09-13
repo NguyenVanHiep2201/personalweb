@@ -1,0 +1,44 @@
+---
+interface Props { title: string; description?: string; active?: string; }
+const { title, description = 'Trang cá nhân của Nguyễn Văn Hiệp - Kỹ thuật, IoT, Automation và những bài viết tản mạn.', active = '' } = Astro.props;
+const nav = [
+  ['Trang chủ','/'], ['Giới thiệu','/about/'], ['Bài viết','/blogs/'], ['Dự án','/projects/'], ['Liên hệ','/contact/']
+];
+---
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+  <meta name="author" content="Nguyễn Văn Hiệp" />
+  <title>{title}</title>
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightbox2@2.11.4/dist/css/lightbox.min.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <ul class="nav-links">
+      {nav.map(([label,href]) => <li><a href={href} class={active === label ? 'active' : ''}>{label}</a></li>)}
+    </ul>
+    <div class="datetime-widget" id="datetimeWidget"></div>
+  </nav>
+  <slot />
+  <a class="admin-link" href="/admin/" title="Khu vực quản trị">Quản trị</a>
+  <script>
+    function updateDateTime() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('vi-VN', { timeZone:'Asia/Ho_Chi_Minh', hour:'2-digit', minute:'2-digit', second:'2-digit' });
+      const solarDateStr = now.toLocaleDateString('vi-VN', { timeZone:'Asia/Ho_Chi_Minh', day:'2-digit', month:'2-digit', year:'numeric' });
+      let lunarStr = '';
+      try { lunarStr = new Intl.DateTimeFormat('vi-VN', { timeZone:'Asia/Ho_Chi_Minh', calendar:'chinese', day:'numeric', month:'numeric' }).format(now); }
+      catch { lunarStr = 'N/A'; }
+      const el=document.getElementById('datetimeWidget');
+      if(el) el.innerHTML = `<div class="time-text">Hà Nội: ${timeStr}</div><div class="date-text">DL: ${solarDateStr} &nbsp;|&nbsp; ÂL: ${lunarStr}</div>`;
+    }
+    updateDateTime(); setInterval(updateDateTime,1000);
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lightbox2@2.11.4/dist/js/lightbox.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Comments from '../../components/Comments.astro';
+import { getCollection, render } from 'astro:content';
+export async function getStaticPaths(){
+  const posts=await getCollection('blog',({data})=>!data.draft);
+  return posts.map(post=>({params:{slug:post.id},props:{post}}));
+}
+const { post }=Astro.props; const { Content }=await render(post);
+const postId=post.data.legacyId || `post-${post.id}`;
+---
+<BaseLayout title={`${post.data.title} - Nguyễn Văn Hiệp`} active="Bài viết" description={post.data.description}>
+<div class="container"><article class="article-container"><h1 class="page-title">{post.data.title}</h1><div class="article-meta">{post.data.date.toLocaleDateString('vi-VN')} · {post.data.category}</div>{post.data.cover && <img class="post-card-cover" src={post.data.cover} alt={post.data.title}>}<div class="article-content markdown-content"><Content /></div><Comments postId={postId} /></article></div>
+</BaseLayout>

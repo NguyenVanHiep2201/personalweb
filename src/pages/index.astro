@@ -1,0 +1,42 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+const posts = (await getCollection('blog', ({data}) => !data.draft)).sort((a,b)=>b.data.date.valueOf()-a.data.date.valueOf());
+const projects = await getCollection('projects');
+const gallery = (await getCollection('gallery')).sort((a,b)=>(b.data.date?.valueOf()||0)-(a.data.date?.valueOf()||0));
+---
+<BaseLayout title="Trang cá nhân - NGUYỄN VĂN HIỆP" active="Trang chủ">
+<header class="hero-section">
+  <div class="avatar-wrapper"><a href="/images/08.2019.jpg" data-lightbox="avatar"><img src="/images/08.2019.jpg" alt="Nguyễn Văn Hiệp" class="avatar"></a></div>
+  <h1>NGUYỄN VĂN HIỆP</h1>
+  <p class="hero-subtitle">"A journey of a thousand miles begins with a single step"</p>
+</header>
+<main class="container">
+  <div class="search-wrapper"><input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm nhanh bài viết hoặc dự án..."></div>
+  <div class="section-wrapper">
+    <h2 class="section-title hidden" id="searchTitle">Kết quả tìm kiếm</h2>
+    <div class="grid-layout hidden" id="searchList">
+      {[...posts.map(p=>({type:'Bài viết',title:p.data.title,desc:p.data.description,href:`/blog/${p.id}/`,cat:p.data.category})), ...projects.map(p=>({type:'Dự án',title:p.data.title,desc:p.data.description,href:'/projects/',cat:p.data.category}))].map(item => <div class="card search-item" data-search={item.title+' '+item.desc+' '+item.cat}><div class="card-tag">{item.cat}</div><h3><a href={item.href}>{item.title}</a></h3><p>{item.desc}</p></div>)}
+    </div>
+  </div>
+  <section class="section-wrapper">
+    <h2 class="section-title">Bài viết mới</h2>
+    <div class="grid-layout">
+      {posts.slice(0,6).map(post => <article class="card">
+        {post.data.cover && <img class="post-card-cover" src={post.data.cover} alt={post.data.title} loading="lazy">}
+        <div class="card-tag">{post.data.category}</div><h3><a href={`/blog/${post.id}/`}>{post.data.title}</a></h3><p>{post.data.description}</p>
+      </article>)}
+    </div>
+  </section>
+  <section class="section-wrapper">
+    <h2 class="section-title">Kỷ niệm</h2>
+    <div class="gallery-grid">
+      {gallery.map(item => <div class="gallery-item"><a href={item.data.image} data-lightbox="gallery"><img src={item.data.image} alt={item.data.alt} loading="lazy"></a>{item.data.caption && <div class="gallery-caption">{item.data.caption}</div>}</div>)}
+    </div>
+  </section>
+</main>
+<script>
+  const input=document.getElementById('searchInput'); const list=document.getElementById('searchList'); const title=document.getElementById('searchTitle');
+  input?.addEventListener('input',()=>{ const q=input.value.toLowerCase().trim(); const items=[...document.querySelectorAll('.search-item')]; if(!q){list.classList.add('hidden');title.classList.add('hidden');return;} let found=0; items.forEach(i=>{const ok=(i.dataset.search||i.textContent).toLowerCase().includes(q);i.classList.toggle('hidden',!ok);if(ok)found++;}); list.classList.toggle('hidden',found===0); title.classList.toggle('hidden',found===0);});
+</script>
+</BaseLayout>

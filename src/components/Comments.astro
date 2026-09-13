@@ -1,0 +1,58 @@
+---
+const { postId } = Astro.props;
+---
+<div class="interactions">
+  <button class="reaction-btn" data-react="heart">❤️ <span id="heartCount">0</span></button>
+  <button class="reaction-btn" data-react="like">👍 <span id="likeCount">0</span></button>
+  <button class="reaction-btn" data-react="dislike">👎 <span id="dislikeCount">0</span></button>
+  <div class="total-reactions">Tổng lượt tương tác: <strong id="totalReactions">0</strong></div>
+</div>
+<div class="comment-section">
+  <h3>Bình luận</h3>
+  <textarea id="commentInput" rows="3" maxlength="2000" placeholder="Nhập bình luận của bạn..."></textarea>
+  <button id="commentSubmit">Gửi bình luận</button>
+  <div class="comments-list" id="commentsList"></div>
+</div>
+<script define:vars={{ postId }} type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js';
+  import { getDatabase, ref, push, onValue, runTransaction } from 'https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js';
+  const firebaseConfig = {
+    apiKey: 'AIzaSyCFkirbAebFrQf6HkBtGvs5Yb-PfMiEcNU',
+    authDomain: 'person-pages.firebaseapp.com',
+    projectId: 'person-pages',
+    storageBucket: 'person-pages.firebasestorage.app',
+    messagingSenderId: '262938467134',
+    appId: '1:262938467134:web:afaf4ff5bb21f17fbf2a6f',
+    measurementId: 'G-QE88C5LG63'
+  };
+  const db = getDatabase(initializeApp(firebaseConfig));
+  const reactionsRef = ref(db, `posts/${postId}/reactions`);
+  onValue(reactionsRef, (snap) => {
+    const d=snap.val()||{}; const h=Number(d.heart||0), l=Number(d.like||0), x=Number(d.dislike||0);
+    document.getElementById('heartCount').textContent=h;
+    document.getElementById('likeCount').textContent=l;
+    document.getElementById('dislikeCount').textContent=x;
+    document.getElementById('totalReactions').textContent=h+l+x;
+  });
+  document.querySelectorAll('[data-react]').forEach(btn => btn.addEventListener('click', async()=>{
+    const type=btn.dataset.react;
+    await runTransaction(ref(db, `posts/${postId}/reactions/${type}`), v => (Number(v)||0)+1);
+  }));
+  const list=document.getElementById('commentsList');
+  onValue(ref(db, `posts/${postId}/comments`), snap => {
+    list.replaceChildren();
+    const entries=Object.values(snap.val()||{}).sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
+    for(const c of entries){
+      const div=document.createElement('div'); div.className='comment';
+      const strong=document.createElement('strong'); strong.textContent=c.time||'';
+      const br=document.createElement('br'); const text=document.createTextNode(c.text||'');
+      div.append(strong,br,text); list.appendChild(div);
+    }
+  });
+  document.getElementById('commentSubmit').addEventListener('click', async()=>{
+    const input=document.getElementById('commentInput'); const text=input.value.trim();
+    if(!text) return;
+    await push(ref(db, `posts/${postId}/comments`), {text:text.slice(0,2000), time:new Date().toLocaleString('vi-VN'), createdAt:new Date().toISOString()});
+    input.value='';
+  });
+</script>

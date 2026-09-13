@@ -1,0 +1,55 @@
+backend:
+  name: git-gateway
+  branch: main
+
+publish_mode: editorial_workflow
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+site_url: "https://YOUR-SITE.netlify.app"
+display_url: "https://YOUR-SITE.netlify.app"
+
+collections:
+  - name: "blog"
+    label: "Bài viết"
+    folder: "src/content/blog"
+    create: true
+    slug: "{{slug}}"
+    format: "frontmatter"
+    fields:
+      - { label: "Tiêu đề", name: "title", widget: "string" }
+      - { label: "Mô tả ngắn", name: "description", widget: "text" }
+      - { label: "Ngày đăng", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "Chuyên mục", name: "category", widget: "string", default: "Tản mạn" }
+      - { label: "Ảnh đại diện", name: "cover", widget: "image", required: false }
+      - { label: "Tags", name: "tags", widget: "list", required: false }
+      - { label: "Bản nháp", name: "draft", widget: "boolean", default: false, required: false }
+      - { label: "Nội dung", name: "body", widget: "markdown" }
+
+  - name: "gallery"
+    label: "Kỷ niệm / Hình ảnh"
+    folder: "src/content/gallery"
+    create: true
+    slug: "{{slug}}"
+    format: "frontmatter"
+    fields:
+      - { label: "Tên ảnh", name: "title", widget: "string" }
+      - { label: "Hình ảnh", name: "image", widget: "image" }
+      - { label: "Alt", name: "alt", widget: "string", default: "Kỷ niệm" }
+      - { label: "Chú thích", name: "caption", widget: "string", required: false }
+      - { label: "Ngày", name: "date", widget: "datetime", format: "YYYY-MM-DD", required: false }
+
+  - name: "projects"
+    label: "Dự án"
+    folder: "src/content/projects"
+    create: true
+    slug: "{{slug}}"
+    format: "frontmatter"
+    fields:
+      - { label: "Tên dự án", name: "title", widget: "string" }
+      - { label: "Mô tả", name: "description", widget: "text" }
+      - { label: "Nhóm", name: "category", widget: "string", default: "Engineering" }
+      - { label: "Công nghệ", name: "technologies", widget: "list", required: false }
+      - { label: "Ảnh", name: "cover", widget: "image", required: false }
+      - { label: "Nổi bật", name: "featured", widget: "boolean", default: false }
+      - { label: "Link", name: "link", widget: "string", default: "#" }

@@ -1,0 +1,6 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+const projects=await getCollection('projects');
+---
+<BaseLayout title="Các dự án đã thực hiện" active="Dự án"><div class="container"><div class="profile-header"><h1>Các dự án đã thực hiện</h1><p class="tagline">Hardware · IoT · Automation · AI</p></div><div class="grid-layout">{projects.map(p=><article class="card">{p.data.cover&&<img class="post-card-cover" src={p.data.cover} alt={p.data.title}>}<div class="card-tag">{p.data.category}</div><h3><a href={p.data.link}>{p.data.title}</a></h3><p>{p.data.description}</p>{p.data.technologies.length&&<p class="article-meta">{p.data.technologies.join(' · ')}</p>}</article>)}</div></div></BaseLayout>
